@@ -1,3 +1,4 @@
+
 # Ignore virtual environment
 .venv/
 
@@ -13,3 +14,22 @@ __pycache__/
 
 # Jupyter checkpoints
 .ipynb_checkpoints/
+=======
+
+# ---- Jupyter ----
+.ipynb_checkpoints/
+*.ipynb~
+
+# ---- Python ----
+__pycache__/
+*.pyc
+.env
+.venv
+venv/
+
+# ---- Editors / OS ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
