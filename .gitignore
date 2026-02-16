@@ -1,4 +1,8 @@
 <<<<<<< HEAD
+
+=======
+<<<<<<< HEAD
+>>>>>>> main
 # Ignore virtual environment
 .venv/
 
@@ -32,4 +36,8 @@ venv/
 .idea/
 .DS_Store
 Thumbs.db
+<<<<<<< HEAD
+
+=======
 >>>>>>> 69bf6cc4 (Add .gitignore file)
+>>>>>>> main
