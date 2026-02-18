@@ -55,7 +55,7 @@ def paramater_search_XGBoost(train: pd.DataFrame, FEATURES: list, TARGET: str, s
     y_train = train[TARGET]
 
     # Create the XGBoost model object
-    xgb_model = xgb.XGBClassifier()
+    xgb_model = xgb.XGBRegressor()
 
     if search_kind == 'grid':
         grid_search_XGBoost(X_train, y_train, xgb_model, param_dist)
@@ -63,9 +63,9 @@ def paramater_search_XGBoost(train: pd.DataFrame, FEATURES: list, TARGET: str, s
         random_search_XGBoost(X_train, y_train, xgb_model, param_dist)
 
 
-def grid_search_XGBoost(X_train: pd.DataFrame, y_train: pd.Series, xgb_model: xgb.XGBClassifier, param_dist: dict) -> None:
+def grid_search_XGBoost(X_train: pd.DataFrame, y_train: pd.Series, xgb_model: xgb.XGBRegressor, param_dist: dict) -> None:
     # Create the GridSearchCV object
-    grid_search = GridSearchCV(xgb_model, param_dist, cv=5, scoring='accuracy')
+    grid_search = GridSearchCV(xgb_model, param_dist, cv=5, scoring='neg_root_mean_squared_error')
 
     # Fit the GridSearchCV object to the training data
     grid_search.fit(X_train, y_train)
@@ -74,9 +74,9 @@ def grid_search_XGBoost(X_train: pd.DataFrame, y_train: pd.Series, xgb_model: xg
     print("Best set of hyperparameters: ", grid_search.best_params_)
     print("Best score: ", grid_search.best_score_)
 
-def random_search_XGBoost(X_train: pd.DataFrame, y_train: pd.Series, xgb_model: xgb.XGBClassifier, param_dist: dict) -> None:
+def random_search_XGBoost(X_train: pd.DataFrame, y_train: pd.Series, xgb_model: xgb.XGBRegressor, param_dist: dict) -> None:
     # Create the RandomizedSearchCV object
-    random_search = RandomizedSearchCV(xgb_model, param_distributions=param_dist, n_iter=10, cv=5, scoring='accuracy')
+    random_search = RandomizedSearchCV(xgb_model, param_distributions=param_dist, n_iter=20, cv=5, scoring='neg_root_mean_squared_error')
 
     # Fit the RandomizedSearchCV object to the training data
     random_search.fit(X_train, y_train)
