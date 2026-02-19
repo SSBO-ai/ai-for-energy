@@ -1,0 +1,48 @@
+# Input data:
+
+# Create sequences (lags) - in this case our lag is 1 day, i.e. 24 hours
+
+X_train, y_train = [], []
+lookback = 24
+
+for i in range(lookback, len(scaled_train)-24):
+    X_train.append(scaled_train[i-lookback:i, 0])
+    y_train.append(scaled_train[i:i+24, 0])   # price is first column
+X_train, y_train = np.array(X_train), np.array(y_train)
+print (X_train.shape, y_train.shape)
+
+X_test, y_test = [], []
+for i in range(lookback, len(scaled_test)-24):
+    X_test.append(scaled_test[i-lookback:i, 0])
+    y_test.append(scaled_test[i:i+24, 0])   # price is first column
+X_test, y_test = np.array(X_test), np.array(y_test)
+print (X_test.shape, y_test.shape)
+
+# The output should be:
+#(52560, 24) (52560, 24)
+#(8711, 24) (8711, 24)
+
+# Building the LSTM model
+
+model = Sequential([
+    LSTM(128, return_sequences=True, input_shape=(lookback, 1)),
+    Dropout(0.2),
+    LSTM(64, return_sequences=False),
+    Dropout(0.2),
+    Dense(24)  # predicting 24 hours at once
+])
+
+model.compile(
+    optimizer="adam",
+    loss="mse"
+)
+
+model.summary()
+
+# Train the model
+training = model.fit(
+    X_train, y_train,
+    epochs=20,
+    batch_size=64,
+    validation_split=0.1
+)

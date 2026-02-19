@@ -1,0 +1,52 @@
+# Input data for the model:
+
+# Create sequences (lags) - in this case our lag is 1 week, i.e. 168 hours
+
+X_train, y_train = [], []
+lookback = 168
+
+for i in range(lookback, len(scaled_train)-168):
+    X_train.append(scaled_train[i-lookback:i, 0])
+    y_train.append(scaled_train[i:i+168, 0])   # price is first column
+X_train, y_train = np.array(X_train), np.array(y_train)
+print (X_train.shape, y_train.shape)
+
+X_test, y_test = [], []
+for i in range(lookback, len(scaled_test)-168):
+    X_test.append(scaled_test[i-lookback:i, 0])
+    y_test.append(scaled_test[i:i+168, 0])   # price is first column
+X_test, y_test = np.array(X_test), np.array(y_test)
+print (X_test.shape, y_test.shape)
+
+# The output of the cell should be
+#(52272, 168) (52272, 168)
+#(8423, 168) (8423, 168)
+
+# Building the LSTM model
+
+model = Sequential([
+    LSTM(168, return_sequences=True, input_shape=(lookback, 1)),
+    Dropout(0.2),
+    LSTM(84, return_sequences=False),
+    Dropout(0.2),
+    Dense(168)  # predicting one week 7*24 hours at once
+])
+
+model.compile(
+    optimizer="adam",
+    loss="mse"
+)
+
+model.summary()
+
+# Train the model
+training = model.fit(
+    X_train, y_train,
+    epochs=20,
+    batch_size=64,
+    validation_split=0.1
+)
+
+# Metrics:
+RMSE: 42.94 EUR/MWh
+MAE: 30.86 EUR/MWh
