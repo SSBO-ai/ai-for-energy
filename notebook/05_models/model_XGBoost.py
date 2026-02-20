@@ -11,8 +11,8 @@ import datetime as dt
 import holidays
 holidays_de= holidays.Germany()
 
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, TimeSeriesSplit
 import scipy.stats as stats
 
 plt.rcParams['figure.figsize'] = [12, 6]
@@ -50,7 +50,7 @@ def display_feature_importance(reg: xgb.XGBRegressor) -> None:
     fi.sort_values('importance').plot(kind='barh', title='Feature Importances')
     plt.show()
 
-def paramater_search_XGBoost(train: pd.DataFrame, FEATURES: list, TARGET: str, search_kind: str, param_dist: dict) -> None:
+def paramater_search_XGBoost(train: pd.DataFrame, FEATURES: list, TARGET: str, search_kind: str, param_dist: dict) -> xgb.XGBRegressor:
     X_train = train[FEATURES]
     y_train = train[TARGET]
 
@@ -58,14 +58,21 @@ def paramater_search_XGBoost(train: pd.DataFrame, FEATURES: list, TARGET: str, s
     xgb_model = xgb.XGBRegressor()
 
     if search_kind == 'grid':
-        grid_search_XGBoost(X_train, y_train, xgb_model, param_dist)
+        best_model = grid_search_XGBoost(X_train, y_train, xgb_model, param_dist)
+        return best_model
     elif search_kind == 'random':
-        random_search_XGBoost(X_train, y_train, xgb_model, param_dist)
+        best_model = random_search_XGBoost(X_train, y_train, xgb_model, param_dist)
+        return best_model
+    else:
+        print(f'Failed to present the correct search kind: {search_kind} was presented')
+        return xgb_model
 
 
-def grid_search_XGBoost(X_train: pd.DataFrame, y_train: pd.Series, xgb_model: xgb.XGBRegressor, param_dist: dict) -> None:
+
+
+def grid_search_XGBoost(X_train: pd.DataFrame, y_train: pd.Series, xgb_model: xgb.XGBRegressor, param_dist: dict) -> xgb.XGBRegressor:
     # Create the GridSearchCV object
-    grid_search = GridSearchCV(xgb_model, param_dist, cv=5, scoring='neg_root_mean_squared_error')
+    grid_search = GridSearchCV(xgb_model, param_dist, scoring='neg_root_mean_squared_error', n_jobs=5) #cv=TimeSeriesSplit(n_splits=5)
 
     # Fit the GridSearchCV object to the training data
     grid_search.fit(X_train, y_train)
@@ -74,7 +81,9 @@ def grid_search_XGBoost(X_train: pd.DataFrame, y_train: pd.Series, xgb_model: xg
     print("Best set of hyperparameters: ", grid_search.best_params_)
     print("Best score: ", grid_search.best_score_)
 
-def random_search_XGBoost(X_train: pd.DataFrame, y_train: pd.Series, xgb_model: xgb.XGBRegressor, param_dist: dict) -> None:
+    return grid_search.best_estimator_
+
+def random_search_XGBoost(X_train: pd.DataFrame, y_train: pd.Series, xgb_model: xgb.XGBRegressor, param_dist: dict) -> xgb.XGBRegressor:
     # Create the RandomizedSearchCV object
     random_search = RandomizedSearchCV(xgb_model, param_distributions=param_dist, n_iter=20, cv=5, scoring='neg_root_mean_squared_error')
 
@@ -84,3 +93,5 @@ def random_search_XGBoost(X_train: pd.DataFrame, y_train: pd.Series, xgb_model: 
     # Print the best set of hyperparameters and the corresponding score
     print("Best set of hyperparameters: ", random_search.best_params_)
     print("Best score: ", random_search.best_score_)
+
+    return random_search.best_estimator_
