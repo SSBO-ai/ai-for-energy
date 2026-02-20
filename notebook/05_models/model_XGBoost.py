@@ -63,8 +63,9 @@ def paramater_search_XGBoost(train: pd.DataFrame, FEATURES: list, TARGET: str, s
     elif search_kind == 'random':
         best_model = random_search_XGBoost(X_train, y_train, xgb_model, param_dist)
         return best_model
-
-
+    else:
+        print(f'Failed to present the correct search kind: {search_kind} was presented')
+        return xgb_model
 
 
 
