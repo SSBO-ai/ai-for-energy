@@ -73,7 +73,7 @@ def paramater_search_XGBoost(train: pd.DataFrame, FEATURES: list, TARGET: str, s
 
 def grid_search_XGBoost(X_train: pd.DataFrame, y_train: pd.Series, xgb_model: xgb.XGBRegressor, param_dist: dict) -> xgb.XGBRegressor:
     # Create the GridSearchCV object
-    grid_search = GridSearchCV(xgb_model, param_dist, scoring='neg_root_mean_squared_error', n_jobs=5) #cv=TimeSeriesSplit(n_splits=5)
+    grid_search = GridSearchCV(xgb_model, param_dist, cv=TimeSeriesSplit(n_splits=5), scoring='neg_root_mean_squared_error', n_jobs=5) #cv=TimeSeriesSplit(n_splits=5)
 
     # Fit the GridSearchCV object to the training data
     grid_search.fit(X_train, y_train)
