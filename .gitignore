@@ -6,6 +6,8 @@
 # Ignore virtual environment
 .venv/
 
+local_backup
+
 # Python cache and bytecode
 __pycache__/
 *.pyc
