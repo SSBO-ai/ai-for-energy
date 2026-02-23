@@ -36,7 +36,8 @@ def create_and_train_XGBoost(train: pd.DataFrame, test: pd.DataFrame, FEATURES: 
                            max_depth=5,
                            enable_categorial=True)
     reg.fit(X_train, y_train,
-            eval_set=[(X_train, y_train), (X_test, y_test)],
+            #eval_set=[(X_train, y_train), (X_test, y_test)],
+            eval_set=[(X_train, y_train)],
             verbose=50 # True prints always, number gives the n-th result
             )
 
